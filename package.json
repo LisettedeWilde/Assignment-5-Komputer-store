@@ -1,0 +1,20 @@
+{
+  "name": "assignment-5-the-komputer-store",
+  "version": "1.0.0",
+  "description": "A dynamic webpage using JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/LisettedeWilde/assignment-5-the-komputer-store.git"
+  },
+  "author": "Lisette de Wilde",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/LisettedeWilde/assignment-5-the-komputer-store/issues"
+  },
+  "homepage": "https://gitlab.com/LisettedeWilde/assignment-5-the-komputer-store#readme"
+}
