@@ -143,7 +143,7 @@ fetch("https://noroff-komputer-store-api.herokuapp.com/computers")
 const addComputersToMenu = (computers) => {
     computers.forEach(comp => addComputerToMenu(comp));
     selectedLaptop = computers[0];
-    imageElement.src = "https://noroff-komputer-store-api.herokuapp.com/" + selectedLaptop.image; // TODO: check if image is png or jpg
+    imageElement.src = "https://noroff-komputer-store-api.herokuapp.com/" + selectedLaptop.image;
     titleElement.innerText = selectedLaptop.title;
     infoElement.innerText = selectedLaptop.description;
     featuresElement.appendChild(makeUl(selectedLaptop.specs));
