@@ -1,4 +1,4 @@
-let computers = [];
+let computers, selectedLaptop;
 
 const computersElement = document.getElementById("computers");
 const imageElement = document.getElementById("laptopImage");
@@ -7,10 +7,14 @@ const infoElement = document.getElementById("computerInfo");
 const featuresElement = document.getElementById('featuresList');
 const priceElement = document.getElementById('computerPrice');
 
+const loanValue = document.getElementById('loan');
+const payValue = document.getElementById('pay');
+const balanceValue = document.getElementById('balance');
+
 // handles click event for Get a loan button
 function handleGetLoanButtonClick() {
-    const currentLoan = parseInt(document.getElementById('loan').innerText)
-    const currentBalance = parseInt(document.getElementById('balance').innerText)
+    const currentLoan = parseInt(loanValue.innerText)
+    const currentBalance = parseInt(balanceValue.innerText)
 
     // you cannot get more than one bank loan before repaying the last loan
     if(currentLoan <= 0) {
@@ -44,65 +48,83 @@ function handleGetLoanButtonClick() {
 
 // handles click event for Work button
 function handleWorkButton() {
-    const currentPay = document.getElementById('pay').textContent;
+    // get current pay value
+    const currentPay = payValue.textContent;
+    // update pay value
     let pay = parseInt(currentPay) + 100;
+    // set pay value in DOM
     document.getElementById("pay").innerText = pay
 }
 
 function updateBalance(money) {
     // add extension to round balance value
-    let balance = parseInt(document.getElementById('balance').innerText)
+    let balance = parseInt(balanceValue.innerText)
     balance = balance + parseInt(money)
+    // set balance value in DOM
     document.getElementById("balance").innerText = balance
 }
 
+// handles click event for Repay Loan button
 function handleRepayLoanButton() {
-    const currentPay = parseInt(document.getElementById('pay').textContent)
-    const currentLoan = parseInt(document.getElementById('loan').innerText)
+    // get current pay and loan
+    const currentPay = parseInt(payValue.textContent)
+    const currentLoan = parseInt(loanValue.innerText)
 
+    // check if pay is higher or equal to outstanding loan
     if (currentPay >= currentLoan)
     {
-        document.getElementById('pay').innerText = currentPay - currentLoan
-        document.getElementById('loan').innerText = 0 
+        // update pay & loan in DOM
+        payValue.innerText = currentPay - currentLoan
+        loanValue.innerText = 0 
     }
     else
     {
-        document.getElementById('pay').innerText = 0
-        document.getElementById('loan').innerText = currentLoan - currentPay
+        // update pay & loan in DOM
+        payValue.innerText = 0
+        loanValue.innerText = currentLoan - currentPay
     }
 }
 
+// handles click event for Bank button
 function handleBankButton() {
-    let currentPay = parseInt(document.getElementById('pay').textContent)
-    let currentBalance = parseInt(document.getElementById('balance').innerText)
-    let currentLoan = parseInt(document.getElementById('loan').innerText)
+    // get current pay, balance and loan from DOM
+    let currentPay = parseInt(payValue.textContent)
+    let currentBalance = parseInt(balanceValue.innerText)
+    let currentLoan = parseInt(loanValue.innerText)
 
-    if (currentLoan == 0) { // change to === ?
+    // check if loan is 0, then all money goes to the balance
+    if (currentLoan === 0) { 
         currentBalance = currentBalance + currentPay
-        document.getElementById('balance').innerText = currentBalance
-        document.getElementById('pay').innerText = 0
+        // update balance & pay in DOM
+        balanceValue.innerText = currentBalance
+        payValue.innerText = 0
     }
+    // if loan is higher than 0, 10% of pay is used to pay of the loan dept
     else if (currentLoan > (currentPay * 0.1)) {
         currentLoan = currentLoan - (currentPay * 0.1)
         currentBalance = currentBalance + (currentPay * 0.9)
-        document.getElementById('balance').innerText = currentBalance
-        document.getElementById('pay').innerText = 0
-        document.getElementById('loan').innerText = currentLoan
+        // update balance, pay & loan in DOM
+        balanceValue.innerText = currentBalance
+        payValue.innerText = 0
+        loanValue.innerText = currentLoan
     }
     else if (currentLoan <= (currentPay * 0.1)) {
         currentBalance = currentBalance + (currentPay - currentLoan)
-        document.getElementById('balance').innerText = currentBalance
-        document.getElementById('pay').innerText = 0
-        document.getElementById('loan').innerText = 0
+        // update balance, pay & loan in DOM
+        balanceValue.innerText = currentBalance
+        payValue.innerText = 0
+        loanValue.innerText = 0
     }
 }
 
+// handles click event for Buy Now button
 function handleBuyNowButton() {
-    const currentBalance = parseInt(document.getElementById('balance').innerText)
+    const currentBalance = parseInt(balanceValue.innerText)
     // check if balance is high enough
     if (currentBalance >= selectedLaptop.price) {
+        // update balance in DOM
         const newBalance = currentBalance - selectedLaptop.price;
-        document.getElementById('balance').innerText = newBalance;
+        balanceValue.innerText = newBalance;
         alert("You are now the owner of the laptop : " + selectedLaptop.title);
     }
     else {
@@ -117,16 +139,18 @@ fetch("https://noroff-komputer-store-api.herokuapp.com/computers")
     .then(data => computers = data) // assign api data to computer array
     .then(computers => addComputersToMenu(computers));
 
+// add computers to dropdown menu and set default computer
 const addComputersToMenu = (computers) => {
     computers.forEach(comp => addComputerToMenu(comp));
     selectedLaptop = computers[0];
-    imageElement.src = "https://noroff-komputer-store-api.herokuapp.com/" + selectedLaptop.image;
+    imageElement.src = "https://noroff-komputer-store-api.herokuapp.com/" + selectedLaptop.image; // TODO: check if image is png or jpg
     titleElement.innerText = selectedLaptop.title;
     infoElement.innerText = selectedLaptop.description;
     featuresElement.appendChild(makeUl(selectedLaptop.specs));
     priceElement.innerText = selectedLaptop.price;
 }
 
+// create option element and add this to the computer dropdown
 const addComputerToMenu = (computer) => {
     const computerElement = document.createElement("option");
     computerElement.value = computer.id;
@@ -134,6 +158,7 @@ const addComputerToMenu = (computer) => {
     computersElement.appendChild(computerElement);
 }
 
+// update DOM values based on selected option in dropdown menu
 const handleComputerMenuChange = e => {
     selectedLaptop = computers[e.target.selectedIndex];
     imageElement.src = "https://noroff-komputer-store-api.herokuapp.com/" + selectedLaptop.image;
@@ -141,21 +166,43 @@ const handleComputerMenuChange = e => {
     infoElement.innerText = selectedLaptop.description;
     featuresElement.innerText = "";
     featuresElement.appendChild(makeUl(selectedLaptop.specs));
-    console.log(makeUl(selectedLaptop.specs))
     priceElement.innerText = selectedLaptop.price;
 }
 
+// eventlistener that checks if a new option has been selected in the computer dropdown
 computersElement.addEventListener("change", handleComputerMenuChange)
 
-// https://stackoverflow.com/questions/11128700/create-a-ul-and-fill-it-based-on-a-passed-array
+// convert array to <ul>
 function makeUl(array) {
     let list = document.createElement('ul');
     
+    // loop through array and add each element as a <li> to the <ul> object
     for (let i = 0; i < array.length; i++) {
         let item = document.createElement('li');
         item.appendChild(document.createTextNode(array[i]));
 
         list.appendChild(item);
     }
+    // return the <ul> object
     return list;
+}
+
+// gets called when an image error occurred, replaces the file extension of the image to fix the broken link
+const fixImage = (image) => {
+    // remove the file extension from the image
+    let url = image.src.replace(/\.[^/.]+$/, "");
+    // get the current file extension
+    let fileExtension = image.src.split('.').pop();
+    // switches the .jpg file extension for a .png file extension
+    if (fileExtension == "jpg") {
+        image.src = url + ".png";
+    }
+    // switches the .png file extension for a .jpg file extension
+    else if (fileExtension == "png") {
+        image.src = url + ".jpg";
+    }
+    // default "image not found" image
+    else {
+        image.src = "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png";
+    }
 }
